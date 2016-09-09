@@ -38,7 +38,7 @@ namespace ConsoleApp3
             var usingSystemDirectives = generator.NamespaceImportDeclaration("System");
             var usingSystemGenricDirectives = generator.NamespaceImportDeclaration("System.Generic");
             var usingEntities = generator.NamespaceImportDeclaration("Entities");
-            var IRepositoryAsynInterfaceType = generator.IdentifierName("IRepositoryAsyn");         
+            var IRepositoryAsynInterfaceType = generator.IdentifierName("IRepositoryAsyn");
             foreach (var className in classNames)
             {
                 var interfaceDeclaration = generator.InterfaceDeclaration(className, typeParameters: null,
@@ -63,9 +63,7 @@ namespace ConsoleApp3
             }
         }
 
-        
-
-    public static void CreateClass(IList<string> classNames)
+        public static void CreateClass(IList<string> classNames)
         {
             var workspace = new AdhocWorkspace();
             var generator = SyntaxGenerator.GetGenerator(workspace, LanguageNames.CSharp);
@@ -76,7 +74,7 @@ namespace ConsoleApp3
             var IUnitofWorkType = generator.IdentifierName("IUnitofWOrk");
             var constructorParameters = new SyntaxNode[] {
                                             generator.ParameterDeclaration("context", IDataContextType),
-                
+
                             generator.ParameterDeclaration("unitofWork",IUnitofWorkType) };
             foreach (var className in classNames)
             {
@@ -93,8 +91,9 @@ namespace ConsoleApp3
                 var newNode = generator.CompilationUnit(usingSystemDirectives, usingSystemGenricDirectives, usingEntities, namespaceDeclaration).
                               NormalizeWhitespace();
                 data = newNode.ToString();
-                var path = Path.GetFullPath("Generated");
-                var logPath = Path.GetFullPath("Generated\\" + className + ".cs");
+                var targetFolder = @"../ConsoleApp3/";
+                var path = Path.GetFullPath(targetFolder + @"Generated/");
+                var logPath = Path.GetFullPath(path + "\\" + className + ".cs");
                 if (!Directory.Exists(path))
                 {
                     Directory.CreateDirectory(path);

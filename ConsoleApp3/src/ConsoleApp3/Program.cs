@@ -27,65 +27,45 @@ namespace ConsoleApp3
                     classNames.Add(item.Identifier.ToString());
                 }
             }
-            // CreateInterface(classNames);
-
-            foreach (var item in classNames)
-            {
-                CreateInterface(item);
-                CreateClass(item);
-            }
+            CreateInterface(classNames);
+            CreateClass(classNames);
         }
 
-        //public static void CreateInterface(IList<string> classNames)
-        //{
-        //    foreach (var className in classNames)
-        //    {
-        //        var workspace = new AdhocWorkspace();
-        //        var generator = SyntaxGenerator.GetGenerator(workspace, LanguageNames.CSharp);
-        //        var usingSystemDirectives = generator.NamespaceImportDeclaration("System");
-        //        var usingSystemGenricDirectives = generator.NamespaceImportDeclaration("System.Generic");
-        //        var usingEntities = generator.NamespaceImportDeclaration("Entities");
-        //        var IRepositoryAsynInterfaceType = generator.IdentifierName("IRepositoryAsyn");
-        //        var interfaceDeclaration = generator.InterfaceDeclaration(className, typeParameters: null,
-        //                                  accessibility: Accessibility.Public,
-        //                                  interfaceTypes: new SyntaxNode[] { IRepositoryAsynInterfaceType },
-        //                                  members: null);
-        //        var namespaceDeclaration = generator.NamespaceDeclaration(className, interfaceDeclaration);
-        //        var newNode = generator.CompilationUnit(usingSystemDirectives, usingSystemGenricDirectives, usingEntities, namespaceDeclaration).
-        //                      NormalizeWhitespace();
-        //        data += newNode;
-        //        var logPath = System.IO.Path.GetFullPath("Generated\\" + "I" + className + ".cs");
-        //        var logFile = System.IO.File.Create(logPath);
-        //        var logWriter = new System.IO.StreamWriter(logFile);
-        //        logWriter.WriteLine(data);
-        //        logWriter.Dispose();
-        //    }
-        //}
-
-        public static void CreateInterface(string className)
+        public static void CreateInterface(IList<string> classNames)
         {
             var workspace = new AdhocWorkspace();
             var generator = SyntaxGenerator.GetGenerator(workspace, LanguageNames.CSharp);
             var usingSystemDirectives = generator.NamespaceImportDeclaration("System");
             var usingSystemGenricDirectives = generator.NamespaceImportDeclaration("System.Generic");
             var usingEntities = generator.NamespaceImportDeclaration("Entities");
-            var IRepositoryAsynInterfaceType = generator.IdentifierName("IRepositoryAsyn");
-            var interfaceDeclaration = generator.InterfaceDeclaration(className, typeParameters: null,
+            var IRepositoryAsynInterfaceType = generator.IdentifierName("IRepositoryAsyn");         
+            foreach (var className in classNames)
+            {
+                var interfaceDeclaration = generator.InterfaceDeclaration(className, typeParameters: null,
                                       accessibility: Accessibility.Public,
                                       interfaceTypes: new SyntaxNode[] { IRepositoryAsynInterfaceType },
                                       members: null);
-            var namespaceDeclaration = generator.NamespaceDeclaration(className, interfaceDeclaration);
-            var newNode = generator.CompilationUnit(usingSystemDirectives, usingSystemGenricDirectives, usingEntities, namespaceDeclaration).
-                          NormalizeWhitespace();
-            data = newNode.ToString();
-            var logPath = System.IO.Path.GetFullPath("Generated\\" + "I" + className + ".cs");
-            var logFile = System.IO.File.Create(logPath);
-            var logWriter = new System.IO.StreamWriter(logFile);
-            logWriter.WriteLine(data);
-            logWriter.Dispose();
+                var namespaceDeclaration = generator.NamespaceDeclaration(className, interfaceDeclaration);
+                var newNode = generator.CompilationUnit(usingSystemDirectives, usingSystemGenricDirectives, usingEntities, namespaceDeclaration).
+                              NormalizeWhitespace();
+                data = newNode.ToString();
+                var path = Path.GetFullPath("Generated");
+                var logPath = Path.GetFullPath("Generated\\" + "I" + className + ".cs");
+                if (!Directory.Exists(path))
+                {
+                    Directory.CreateDirectory(path);
+                }
+                File.SetAttributes(path, FileAttributes.Normal);
+                var logFile = File.Create(logPath);
+                var logWriter = new System.IO.StreamWriter(logFile);
+                logWriter.WriteLine(data);
+                logWriter.Dispose();
+            }
         }
 
-        public static void CreateClass(string className)
+        
+
+    public static void CreateClass(IList<string> classNames)
         {
             var workspace = new AdhocWorkspace();
             var generator = SyntaxGenerator.GetGenerator(workspace, LanguageNames.CSharp);
@@ -96,25 +76,35 @@ namespace ConsoleApp3
             var IUnitofWorkType = generator.IdentifierName("IUnitofWOrk");
             var constructorParameters = new SyntaxNode[] {
                                             generator.ParameterDeclaration("context", IDataContextType),
-                                            generator.ParameterDeclaration("unitofWork",IUnitofWorkType) };
-            var constructor = generator.ConstructorDeclaration(className,
-                                        constructorParameters, Accessibility.Public,
-                                        statements: null);
-            var members = new SyntaxNode[] { constructor };
-            var IRepositoryInterfaceType = generator.IdentifierName("I" + className + "Repository");
-            var classDeclaration = generator.ClassDeclaration(className, typeParameters: null,
-                                      accessibility: Accessibility.Public,
-                                      interfaceTypes: new SyntaxNode[] { IRepositoryInterfaceType },
-                                      members: members);
-            var namespaceDeclaration = generator.NamespaceDeclaration(className, classDeclaration);
-            var newNode = generator.CompilationUnit(usingSystemDirectives, usingSystemGenricDirectives, usingEntities, namespaceDeclaration).
-                          NormalizeWhitespace();
-            data = newNode.ToString();
-            var logPath = System.IO.Path.GetFullPath("Generated\\" + className + ".cs");
-            var logFile = System.IO.File.Create(logPath);
-            var logWriter = new System.IO.StreamWriter(logFile);
-            logWriter.WriteLine(data);
-            logWriter.Dispose();
+                
+                            generator.ParameterDeclaration("unitofWork",IUnitofWorkType) };
+            foreach (var className in classNames)
+            {
+                var constructor = generator.ConstructorDeclaration(className,
+                                         constructorParameters, Accessibility.Public,
+                                         statements: null);
+                var members = new SyntaxNode[] { constructor };
+                var IRepositoryInterfaceType = generator.IdentifierName("I" + className + "Repository");
+                var classDeclaration = generator.ClassDeclaration(className, typeParameters: null,
+                                          accessibility: Accessibility.Public,
+                                          interfaceTypes: new SyntaxNode[] { IRepositoryInterfaceType },
+                                          members: members);
+                var namespaceDeclaration = generator.NamespaceDeclaration(className, classDeclaration);
+                var newNode = generator.CompilationUnit(usingSystemDirectives, usingSystemGenricDirectives, usingEntities, namespaceDeclaration).
+                              NormalizeWhitespace();
+                data = newNode.ToString();
+                var path = Path.GetFullPath("Generated");
+                var logPath = Path.GetFullPath("Generated\\" + className + ".cs");
+                if (!Directory.Exists(path))
+                {
+                    Directory.CreateDirectory(path);
+                }
+                File.SetAttributes(path, FileAttributes.Normal);
+                var logFile = File.Create(logPath);
+                var logWriter = new System.IO.StreamWriter(logFile);
+                logWriter.WriteLine(data);
+                logWriter.Dispose();
+            }
         }
     }
 }

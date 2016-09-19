@@ -7,20 +7,19 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Editing;
 
-Console.WriteLine("Enter a number");
-var x = Convert.ToInt32(Console.ReadLine());
+
 Program p = new Program();
-Console.WriteLine("The Value is {0}", Program.GetValue(x));
+Program.GetValue();
 
 public class Program
 {
     public static string data { get; set; }
 
-    public static int GetValue(int id)
+    public static void GetValue()
     {
         var currentNamespace = System.Reflection.Assembly.GetEntryAssembly().EntryPoint.DeclaringType.Namespace;
-        IList<string> classNames = new List<string>();
-        var list = Directory.EnumerateFiles(Path.GetDirectoryName(@"D:\Roslyn\Roslyn Latest\RoslynCodeGen\ConsoleApp3\src\ConsoleApp3\Entities\")).Where(x => Path.GetExtension(x) == ".cs");
+        IList<string> classNames = new List<string>();       
+         var list = Directory.EnumerateFiles(Path.GetDirectoryName(@"C: \Users\mkandadai\Desktop\RoslynCodeGen\ConsoleApp3\src\ConsoleApp3\Entities\")).Where(x => Path.GetExtension(x) == ".cs");
         var text = list.Select(x => CSharpSyntaxTree.ParseText(File.ReadAllText(x))).Cast<CSharpSyntaxTree>();
         foreach (CSharpSyntaxTree syntaxTree in text)
         {
@@ -31,17 +30,18 @@ public class Program
                 classNames.Add(item.Identifier.ToString());
             }
         }
+        Console.WriteLine("Creating Interfaces");
         CreateInterface(classNames, currentNamespace);
+        Console.WriteLine("Creating Classes");
         CreateClass(classNames, currentNamespace);
-        return id;
+        Console.WriteLine("Completed");
     }
 
     public static void CreateInterface(IList<string> classNames, string currentNamespace)
     {
-
         var workspace = new AdhocWorkspace();
         var generator = SyntaxGenerator.GetGenerator(workspace, LanguageNames.CSharp);
-        var usingSystemDirectives = generator.NamespaceImportDeclaration("System");        
+        var usingSystemDirectives = generator.NamespaceImportDeclaration("System");
         var usingEntities = generator.NamespaceImportDeclaration("ConsoleApp3");
         var IRepositoryAsynInterfaceType = generator.IdentifierName("IRepositoryAsync");
         foreach (var className in classNames)
@@ -72,7 +72,7 @@ public class Program
     {
         var workspace = new AdhocWorkspace();
         var generator = SyntaxGenerator.GetGenerator(workspace, LanguageNames.CSharp);
-        var usingSystemDirectives = generator.NamespaceImportDeclaration("System");        
+        var usingSystemDirectives = generator.NamespaceImportDeclaration("System");
         var usingEntities = generator.NamespaceImportDeclaration("ConsoleApp3");
         var IDataContextType = generator.IdentifierName("IDataContext");
         var IUnitofWorkType = generator.IdentifierName("IUnitofWork");

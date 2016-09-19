@@ -1,2 +1,0 @@
-scriptcs sample.csx
-exit

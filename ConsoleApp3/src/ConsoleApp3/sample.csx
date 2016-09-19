@@ -17,9 +17,9 @@ public class Program
 
     public static void GetValue()
     {
-        var currentNamespace = System.Reflection.Assembly.GetEntryAssembly().EntryPoint.DeclaringType.Namespace;
-        IList<string> classNames = new List<string>();       
-         var list = Directory.EnumerateFiles(Path.GetDirectoryName(@"C: \Users\mkandadai\Desktop\RoslynCodeGen\ConsoleApp3\src\ConsoleApp3\Entities\")).Where(x => Path.GetExtension(x) == ".cs");
+        var currentNamespace = Directory.GetCurrentDirectory().Split('\\').Last();
+        IList<string> classNames = new List<string>();
+        var list = Directory.EnumerateFiles(Path.GetDirectoryName(@"Entities\")).Where(x => Path.GetExtension(x) == ".cs");
         var text = list.Select(x => CSharpSyntaxTree.ParseText(File.ReadAllText(x))).Cast<CSharpSyntaxTree>();
         foreach (CSharpSyntaxTree syntaxTree in text)
         {
@@ -30,6 +30,7 @@ public class Program
                 classNames.Add(item.Identifier.ToString());
             }
         }
+        Console.WriteLine("namespace is" + currentNamespace);
         Console.WriteLine("Creating Interfaces");
         CreateInterface(classNames, currentNamespace);
         Console.WriteLine("Creating Classes");

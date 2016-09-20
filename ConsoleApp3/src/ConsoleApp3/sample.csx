@@ -9,13 +9,13 @@ using Microsoft.CodeAnalysis.Editing;
 
 
 Program p = new Program();
-Program.GetValue();
+p.GetValue();
 
 public class Program
 {
-    public static string data { get; set; }
+    public string data { get; set; }
 
-    public static void GetValue()
+    public void GetValue()
     {
         var currentNamespace = Directory.GetCurrentDirectory().Split('\\').Last();
         IList<string> classNames = new List<string>();
@@ -30,7 +30,7 @@ public class Program
                 classNames.Add(item.Identifier.ToString());
             }
         }
-        Console.WriteLine("namespace is" + currentNamespace);
+        Console.WriteLine("namespace is " + currentNamespace);
         Console.WriteLine("Creating Interfaces");
         CreateInterface(classNames, currentNamespace);
         Console.WriteLine("Creating Classes");
@@ -38,7 +38,7 @@ public class Program
         Console.WriteLine("Completed");
     }
 
-    public static void CreateInterface(IList<string> classNames, string currentNamespace)
+    public void CreateInterface(IList<string> classNames, string currentNamespace)
     {
         var workspace = new AdhocWorkspace();
         var generator = SyntaxGenerator.GetGenerator(workspace, LanguageNames.CSharp);
@@ -55,21 +55,11 @@ public class Program
             var newNode = generator.CompilationUnit(usingSystemDirectives, usingEntities, namespaceDeclaration).
                           NormalizeWhitespace();
             data = newNode.ToString();
-            var path = Path.GetFullPath("Generated");
-            var logPath = Path.GetFullPath("Generated\\" + "I" + className + "Repository" + ".cs");
-            if (!Directory.Exists(path))
-            {
-                Directory.CreateDirectory(path);
-            }
-            File.SetAttributes(path, FileAttributes.Normal);
-            var logFile = File.Create(logPath);
-            var logWriter = new System.IO.StreamWriter(logFile);
-            logWriter.WriteLine(data);
-            logWriter.Dispose();
+            CreateFile(data, className, "interface");
         }
     }
 
-    public static void CreateClass(IList<string> classNames, string currentNamespace)
+    public void CreateClass(IList<string> classNames, string currentNamespace)
     {
         var workspace = new AdhocWorkspace();
         var generator = SyntaxGenerator.GetGenerator(workspace, LanguageNames.CSharp);
@@ -96,18 +86,30 @@ public class Program
             var newNode = generator.CompilationUnit(usingSystemDirectives, usingEntities, namespaceDeclaration).
                           NormalizeWhitespace();
             data = newNode.ToString();
-            var targetFolder = @"../ConsoleApp3/";
-            var path = Path.GetFullPath(targetFolder + @"Generated/");
-            var logPath = Path.GetFullPath(path + "\\" + className + "Repository" + ".cs");
-            if (!Directory.Exists(path))
-            {
-                Directory.CreateDirectory(path);
-            }
-            File.SetAttributes(path, FileAttributes.Normal);
-            var logFile = File.Create(logPath);
-            var logWriter = new System.IO.StreamWriter(logFile);
-            logWriter.WriteLine(data);
-            logWriter.Dispose();
+            CreateFile(data, className, "class");
         }
+    }
+
+    public void CreateFile(string data, string className, string type)
+    {
+        string path;
+        if (type == "class")
+        {
+            path = Path.GetFullPath("Repositories");
+        }
+        else
+        {
+            path = Path.GetFullPath("Interfaces");
+        }
+        var logPath = Path.GetFullPath(path + "\\" + "I" + className + "Repository" + ".cs");
+        if (!Directory.Exists(path))
+        {
+            Directory.CreateDirectory(path);
+        }
+        File.SetAttributes(path, FileAttributes.Normal);
+        var logFile = File.Create(logPath);
+        var logWriter = new System.IO.StreamWriter(logFile);
+        logWriter.WriteLine(data);
+        logWriter.Dispose();
     }
 }

@@ -78,8 +78,14 @@ namespace ConsoleApp3
             var newNode = generator.CompilationUnit(usingSystemDirectives, usingSystemGenricDirectives, usingEntities, namespaceDeclaration).
                           NormalizeWhitespace();
             data = newNode.ToString();
-            var logPath = System.IO.Path.GetFullPath("Generated\\" + "I" + className + ".cs");
-            var logFile = System.IO.File.Create(logPath);
+            var path = Path.GetFullPath("Generated");
+            var logPath = Path.GetFullPath("Generated\\" + "I" + className + ".cs");            
+            if (!Directory.Exists(path))
+            {
+                Directory.CreateDirectory(path);
+            }
+            File.SetAttributes(path, FileAttributes.Normal);
+            var logFile = File.Create(logPath);
             var logWriter = new System.IO.StreamWriter(logFile);
             logWriter.WriteLine(data);
             logWriter.Dispose();

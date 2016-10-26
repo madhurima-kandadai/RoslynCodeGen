@@ -6,5 +6,5 @@
             "arguments": "/c cd src\\ConsoleApp3 && scriptcs -install && scriptcs sample.csx"
         }
     },
-    "-vs-binding": { "AfterBuild": [ "test" ] }
+    "-vs-binding": { "AfterBuild": [ "test", test ] }
 }
